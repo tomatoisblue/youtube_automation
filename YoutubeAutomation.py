@@ -1,3 +1,4 @@
+from tkinter import E
 from selenium import webdriver as wd
 import chromedriver_binary
 from selenium.webdriver.chrome.options import Options
@@ -41,12 +42,17 @@ class YouTubeAutomation:
 
 	def ad_check(self):
 		try:
-			self.driver.find_element(By.XPATH, '//*[@id="ad-preview:15"]/span')
+			elem = self.driver.find_elements(By.XPATH, '//*[@id="ad-preview:15"]/span')
+			# self.driver.find_elements(By.CLASS_NAME, 'ytp-ad-player-overlay')
+		except:
+			pass
+		if len(elem) > 0:
 			print("ad exists")
 			return True
-		except:
+		else:
 			print("ad NOT existed")
 			return False
+
 
 	def ad_skip(self):
 		try:
@@ -58,44 +64,43 @@ class YouTubeAutomation:
 
 	def set_resolution(self):
 		try:
-			print("setting video quality...")
+			print("setting video resolution...")
 			list = self.driver.find_elements(By.CLASS_NAME, "ytp-settings-button")
 			list[0].click()
-			time.sleep(1)
 			# click quality button
-			self.driver.find_element(By.XPATH, "//div[contains(text(),'Quality')]").click()
-			time.sleep(1)
+			self.wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(),'Quality')]"))).click()
+
 			# set to 144p
-			self.driver.find_element(By.XPATH, "//span[contains(string(),'144p')]").click()
-			print("resolution setting accomplished")
+			self.wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(string(),'144p')]"))).click()
 		except:
 			print("cannot set resolution")
+		print("resolution setting accomplished")
 
 
 	def close_chat(self):
 		try:
 			self.driver.find_element(By.XPATH, '//*[@id="show-hide-button"]/ytd-toggle-button-renderer/a').click()
-			print("chat closed")
 		except:
 			print("cannot close chat")
-			pass
+		print("chat closed")
 
 	def play(self):
 		try:
 			self.driver.find_element(By.XPATH, '//*[@id="movie_player"]/div[29]/div[2]/div[1]/button').click()
 		except:
 			print("cannot click play button")
-			pass
 
 
 	def minimize(self):
-		self.driver.minimize_window()
+		try:
+			self.driver.minimize_window()
+		except:
+			print("window NOT minimize")
+		print("window minimized")
 
 	def basic_background(self):
 		if self.ad_check():
-			print("ad existed")
 			self.ad_skip()
-			time.sleep(10)
 		self.play()
 		self.set_resolution()
 		self.close_chat()
