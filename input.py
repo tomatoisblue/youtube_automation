@@ -10,7 +10,8 @@ if __name__ == "__main__":
 	yt = YoutubeAutomation.YouTubeAutomation(detach = True)
 	yt.open(url)
 
-	yt.basic_background()
+	yt.ad_routine()
+
 	print("COMPLETED")
 
 	# OSOperation.close_foreground_window()

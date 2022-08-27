@@ -1,3 +1,4 @@
+from ssl import ALERT_DESCRIPTION_UNEXPECTED_MESSAGE
 from tkinter import E
 from selenium import webdriver as wd
 import chromedriver_binary
@@ -19,7 +20,9 @@ class YouTubeAutomation:
 			self.options.add_experimental_option('detach', True)
 
 		self.set_options()
-		self.wait = WebDriverWait(self.driver, 20*60)
+		self.wait = WebDriverWait(self.driver, 20)
+
+		self.pattern = '[0-9]+'
 
 	# set driver option
 	def set_options(self):
@@ -42,25 +45,22 @@ class YouTubeAutomation:
 
 	def ad_check(self):
 		try:
-			elem = self.driver.find_elements(By.XPATH, '//*[@id="ad-preview:15"]/span')
-			# self.driver.find_elements(By.CLASS_NAME, 'ytp-ad-player-overlay')
+			self.driver.find_element(By.CSS_SELECTOR, 'div[id^="ad-text:"]')
 		except:
-			pass
-		if len(elem) > 0:
-			print("ad exists")
-			return True
-		else:
-			print("ad NOT existed")
+			print("ad NOT exist")
 			return False
+		print("ad exists")
+		return True
 
 
 	def ad_skip(self):
+		print("trying to skip ad...")
 		try:
-			print("trying to skip ad...")
 			elem_ad = self.wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "ytp-ad-skip-button")))
 			elem_ad.click()
 		except:
-			print("cannot skip ad")
+			print("somehow cannot skip ad")
+		print("ad skipped")
 
 	def set_resolution(self):
 		try:
@@ -69,11 +69,12 @@ class YouTubeAutomation:
 			list[0].click()
 			# click quality button
 			self.wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(),'Quality')]"))).click()
-
 			# set to 144p
 			self.wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(string(),'144p')]"))).click()
+
 		except:
 			print("cannot set resolution")
+
 		print("resolution setting accomplished")
 
 
@@ -83,6 +84,12 @@ class YouTubeAutomation:
 		except:
 			print("cannot close chat")
 		print("chat closed")
+
+	def close_premium_banner(self):
+		try:
+			self.driver.find_elements(By.XPATH, '//*[@id="dismiss-button"]/a').click()
+		except:
+			print("cannot close youtube premium banner")
 
 	def play(self):
 		try:
@@ -104,11 +111,12 @@ class YouTubeAutomation:
 		self.play()
 		self.set_resolution()
 		self.close_chat()
+		self.close_premium_banner()
 		self.minimize()
 
 	def ad_routine(self):
 		while True:
 			if self.ad_check():
 				self.ad_skip()
-			time.sleep(2)
+			time.sleep(5)
 			print("ad warden is in opration...")
