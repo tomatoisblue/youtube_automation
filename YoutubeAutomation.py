@@ -1,5 +1,3 @@
-from ssl import ALERT_DESCRIPTION_UNEXPECTED_MESSAGE
-from tkinter import E
 from selenium import webdriver as wd
 import chromedriver_binary
 from selenium.webdriver.chrome.options import Options
@@ -106,8 +104,12 @@ class YouTubeAutomation:
 		print("window minimized")
 
 	def basic_background(self):
-		if self.ad_check():
-			self.ad_skip()
+		cnt = 0
+		while(cnt<2):
+			if self.ad_check():
+				self.ad_skip()
+			time.sleep(2)
+			cnt += 1
 		self.play()
 		self.set_resolution()
 		self.close_chat()
@@ -119,4 +121,4 @@ class YouTubeAutomation:
 			if self.ad_check():
 				self.ad_skip()
 			time.sleep(5)
-			print("ad warden is in opration...")
+			print("warden of ad is in operation...")

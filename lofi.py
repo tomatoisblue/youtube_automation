@@ -15,6 +15,8 @@ if __name__ == "__main__":
 	yt.open(video_url)
 	yt.basic_background()
 	# OSOperation.close_foreground_window()
+	OSOperation.minimize_foreground_window()
+
 	print("COMPLETED")
 
 	yt.ad_routine()
