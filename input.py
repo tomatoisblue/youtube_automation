@@ -6,12 +6,11 @@ import OSOperation
 if __name__ == "__main__":
 	url = input()
 
-	# open video page with YouTubeTools
-	yt = YoutubeAutomation.YouTubeAutomation(detach = True)
+	yt = YoutubeAutomation.YouTube(detach = True)
 	yt.open(url)
-
-	yt.ad_routine()
+	yt.basic_background()
+	OSOperation.minimize_foreground_window()
 
 	print("COMPLETED")
+	yt.ad_routine()
 
-	# OSOperation.close_foreground_window()

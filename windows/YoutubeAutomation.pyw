@@ -6,33 +6,37 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 
-class YouTubeAutomation:
-	def __init__(self, incognito = True, headless = False, detach = False):
+class YouTube:
+	def __init__(self, incognito = True, headless = False, detach = False, brave = False):
 		self.options = Options()
+		self.brave = False
+
 		# open in incognito
 		if incognito:
 			self.options.add_argument('--incognito')
+		# open with no gui
 		if headless:
 			self.options.add_argument('headless')
+		# keep browser open
 		if detach:
 			self.options.add_experimental_option('detach', True)
+		# open in brave
+		if brave:
+			# set path to your brave binary file
+			self.options.binary_location = 'C:\Program Files\BraveSoftware\Brave-Browser\Application\\brave.exe'
+			self.brave = True
 
 		self.set_options()
 		self.wait = WebDriverWait(self.driver, 20)
-
-		self.pattern = '[0-9]+'
 
 	# set driver option
 	def set_options(self):
 		self.driver = wd.Chrome(options = self.options)
 
-	def headless(self):
-		self.options.add_argument('headless')
-		self.set_options()
-
 	def open(self, url):
 		self.driver.get(url)
 
+	# when you are on channel page
 	def get_url_of_top_video(self):
 		try:
 			elem = self.driver.find_element(By.XPATH, '//*[@id="video-title"]')
@@ -60,15 +64,32 @@ class YouTubeAutomation:
 			print("somehow cannot skip ad")
 		print("ad skipped")
 
-	def set_resolution(self):
+	# set video resolution
+	# default is 144p
+	def set_resolution(self, res = "144p"):
 		try:
 			print("setting video resolution...")
-			list = self.driver.find_elements(By.CLASS_NAME, "ytp-settings-button")
-			list[0].click()
+			elem = self.driver.find_elements(By.CLASS_NAME, "ytp-settings-button")
+			elem[0].click()
 			# click quality button
 			self.wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(),'Quality')]"))).click()
 			# set to 144p
-			self.wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(string(),'144p')]"))).click()
+			if res == "1080p60":
+				self.wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(string(),'1080p60')]"))).click()
+			elif res == "1080p":
+				self.wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(string(),'1080p')]"))).click()
+			elif res == "720p60":
+				self.wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(string(),'720p60')]"))).click()
+			elif res == "720p":
+				self.wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(string(),'720p')]"))).click()
+			elif res == "480p":
+				self.wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(string(),'480p')]"))).click()
+			elif res == "360p":
+				self.wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(string(),'360p')]"))).click()
+			elif res == "240p":
+				self.wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(string(),'240p')]"))).click()
+			else:
+				self.wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(string(),'144p')]"))).click()
 
 		except:
 			print("cannot set resolution")
@@ -100,16 +121,17 @@ class YouTubeAutomation:
 		try:
 			self.driver.minimize_window()
 		except:
-			print("window NOT minimize")
+			print("window NOT minimized")
 		print("window minimized")
 
 	def basic_background(self):
-		cnt = 0
-		while(cnt<2):
-			if self.ad_check():
-				self.ad_skip()
-			time.sleep(2)
-			cnt += 1
+		if not self.brave:
+			cnt = 0
+			while(cnt<2):
+				if self.ad_check():
+					self.ad_skip()
+				time.sleep(2)
+				cnt += 1
 		self.play()
 		self.set_resolution()
 		self.close_chat()
@@ -117,6 +139,9 @@ class YouTubeAutomation:
 		self.minimize()
 
 	def ad_routine(self):
+		if self.brave:
+			print("you are on brave, so don't have to run ad_routine.")
+			return
 		while True:
 			if self.ad_check():
 				self.ad_skip()
